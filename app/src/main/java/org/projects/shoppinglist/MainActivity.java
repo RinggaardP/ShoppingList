@@ -23,9 +23,9 @@ public class MainActivity extends AppCompatActivity {
     private String name = "";
 
 
-    ArrayAdapter<String> adapter;
+    ArrayAdapter<Product> adapter;
     ListView listView;
-    ArrayList<String> bag = new ArrayList<String>();
+    ArrayList<Product> bag = new ArrayList<Product>();
 
     public ArrayAdapter getMyAdapter()
     {
@@ -41,7 +41,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (savedInstanceState!=null)
         {
-                 bag = savedInstanceState.getStringArrayList("list");
+            if (savedInstanceState.containsKey("bag"))
+                bag = savedInstanceState.getParcelableArrayList("bag");
         }
 
         //getting our listiew - you can check the ID in the xml to see that it
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.list);
         //here we create a new adapter linking the bag and the
         //listview
-        adapter =  new ArrayAdapter<String>(this,
+        adapter =  new ArrayAdapter<Product>(this,
                 android.R.layout.simple_list_item_checked,bag );
 
         //setting the adapter on the listview
@@ -63,7 +64,9 @@ public class MainActivity extends AppCompatActivity {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                adapter.add(getProductQuantity() + " " + getProductName());
+                //læs fra edittext felterne
+                Product p = new Product(getProductName(),getProductQuantityInt());
+                adapter.add(p);
                 //The next line is needed in order to say to the ListView
                 //that the data has changed - we have added stuff now!
                 getMyAdapter().notifyDataSetChanged();
@@ -120,6 +123,13 @@ public class MainActivity extends AppCompatActivity {
 
         return addTextQ.getText().toString();
     }
+
+    public int getProductQuantityInt(){
+        EditText addTextQ = (EditText) findViewById(R.id.addTextQ);
+        String s = addTextQ.getText().toString();
+        return Integer.parseInt(s);
+
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -144,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onSaveInstanceState");
 		/* Here we put code now to save the state */
         //outState.putString("savedName", name);
-        outState.putStringArrayList("list", bag);
+        outState.putParcelableArrayList("bag", bag);
 
     }
     //this is called when our activity is recreated, but
