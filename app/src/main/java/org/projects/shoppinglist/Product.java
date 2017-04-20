@@ -14,7 +14,7 @@ public class Product implements Parcelable {
 
     public Product() {} //Empty constructor we will need later!
 
-    public Product(String name, int quantity)
+    public Product(int quantity, String name)
     {
         this.name = name;
         this.quantity = quantity;

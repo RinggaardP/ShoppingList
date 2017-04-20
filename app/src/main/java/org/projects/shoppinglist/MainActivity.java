@@ -1,5 +1,6 @@
 package org.projects.shoppinglist;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -7,23 +8,35 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import static org.projects.shoppinglist.ProductInfoAdapter.context;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MyDialogFragment.OnPositiveListener {
+
+
+    private String[] items = { "0", "1", "2", "3", "4",
+            "5", "6", "7" };
 
     private static final String TAG = "com.example.StateChange";
     private String name = "";
 
+    static MyDialogFragment dialog;
+    static Context context;
+
 
     ArrayAdapter<Product> adapter;
+    ArrayAdapter<String> adapter2;
     ListView listView;
     ArrayList<Product> bag = new ArrayList<Product>();
 
@@ -32,26 +45,76 @@ public class MainActivity extends AppCompatActivity {
         return adapter;
     }
 
+    Product lastDeletedProduct;
+    int lastDeletedPosition;
+
+    public void onPositiveClicked() {
+        //Do your update stuff here to the listview
+        //and the bag etc
+        //just to show how to get arguments from the bag.
+        Toast toast = Toast.makeText(context,
+                "positive button clicked", Toast.LENGTH_LONG);
+        toast.show();
+        adapter.clear(); //here you can do stuff with the bag and
+        //adapter etc.
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.context = this;
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        if (savedInstanceState!=null)
-        {
+        if (savedInstanceState != null) {
             if (savedInstanceState.containsKey("bag"))
                 bag = savedInstanceState.getParcelableArrayList("bag");
         }
+
+        Spinner spinner = (Spinner) findViewById(R.id.addTextQ);
+
+        //we use a predefined simple spinner drop down,
+        //you could define your own layout, so that for instance
+        //there was pictures in the drop down list.
+        adapter2 = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item, items);
+
+        spinner.setAdapter(adapter2);
+
+        spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+            //The AdapterView<?> type means that this can be any type,
+            //so we can use both AdapterView<String> or any other
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view,
+                                       int position, long id) {
+                //So this code is called when ever the spinner is clicked
+                Toast.makeText(MainActivity.this,
+                        "Item selected: " + items[position], Toast.LENGTH_SHORT)
+                        .show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO you would normally do something here
+                // for instace setting the selected item to "null"
+                // or something.
+            }
+        });
+
+        //This line will get the actual seleted item -
+        //in our case the values in the spinner is simply
+        //strings, so we need to make a cast to a String
+        String item = (String) spinner.getSelectedItem();
 
         //getting our listiew - you can check the ID in the xml to see that it
         //is indeed specified as "list"
         listView = (ListView) findViewById(R.id.list);
         //here we create a new adapter linking the bag and the
         //listview
-        adapter =  new ArrayAdapter<Product>(this,
-                android.R.layout.simple_list_item_checked,bag );
+        adapter = new ArrayAdapter<Product>(this,
+                android.R.layout.simple_list_item_checked, bag);
 
         //setting the adapter on the listview
         listView.setAdapter(adapter);
@@ -65,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //læs fra edittext felterne
-                Product p = new Product(getProductName(),getProductQuantityInt());
+                Product p = new Product(getProductQuantityInt(), getProductName());
                 adapter.add(p);
                 //The next line is needed in order to say to the ListView
                 //that the data has changed - we have added stuff now!
@@ -87,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button clearButton = (Button) findViewById(R.id.clearButton);
+        /*Button clearButton = (Button) findViewById(R.id.clearButton);
 
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,13 +160,34 @@ public class MainActivity extends AppCompatActivity {
                 //that the data has changed - we have added stuff now!
                 getMyAdapter().notifyDataSetChanged();
             }
-        });
+        })*/
+
+    }
 
         //add some stuff to the list so we have something
         // to show on app startup
         //bag.add("Bananas");
         //bag.add("Apples");
 
+        public void showDialog(View v) {
+            //showing our dialog.
+
+            dialog = new MyDialog();
+            //Here we show the dialog
+            //The tag "MyFragement" is not important for us.
+            dialog.show(getFragmentManager(), "MyFragment");
+        }
+
+    public static class MyDialog extends MyDialogFragment {
+
+
+        @Override
+        protected void negativeClick() {
+            //Here we override the method and can now do something
+            Toast toast = Toast.makeText(context,
+                    "negative button clicked", Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
 
     @Override
@@ -119,14 +203,14 @@ public class MainActivity extends AppCompatActivity {
         return addText.getText().toString();
     }
     public String getProductQuantity(){
-        EditText addTextQ = (EditText) findViewById(R.id.addTextQ);
+        Spinner addTextQ = (Spinner) findViewById(R.id.addTextQ);
 
-        return addTextQ.getText().toString();
+        return addTextQ.toString();
     }
 
     public int getProductQuantityInt(){
-        EditText addTextQ = (EditText) findViewById(R.id.addTextQ);
-        String s = addTextQ.getText().toString();
+        Spinner addTextQ = (Spinner) findViewById(R.id.addTextQ);
+        String s = addTextQ.getSelectedItem().toString();
         return Integer.parseInt(s);
 
     }
@@ -160,6 +244,13 @@ public class MainActivity extends AppCompatActivity {
     //this is called when our activity is recreated, but
     //AFTER our onCreate method has been called
     //EXTREMELY IMPORTANT DETAIL
+
+    public void saveCopy()
+    {
+        lastDeletedPosition = listView.getCheckedItemPosition();
+        lastDeletedProduct = bag.get(lastDeletedPosition);
+    }
+
 
 
 
