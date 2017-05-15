@@ -5,4 +5,5 @@
     <string name="areYouSure">Are you sure?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="send_to">Send to</string>
 </resources>

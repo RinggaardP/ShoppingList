@@ -1,6 +1,7 @@
 package org.projects.shoppinglist;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,6 +21,10 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import com.firebase.ui.database.FirebaseListAdapter;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import static org.projects.shoppinglist.ProductInfoAdapter.context;
 
 public class MainActivity extends AppCompatActivity implements MyDialogFragment.OnPositiveListener {
@@ -38,11 +43,13 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
     ArrayAdapter<Product> adapter;
     ArrayAdapter<String> adapter2;
     ListView listView;
+    FirebaseListAdapter<Product> mAdapter;
+    DatabaseReference firebase;
     ArrayList<Product> bag = new ArrayList<Product>();
 
-    public ArrayAdapter getMyAdapter()
+    public FirebaseListAdapter getMyAdapter()
     {
-        return adapter;
+        return mAdapter;
     }
 
     Product lastDeletedProduct;
@@ -55,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         Toast toast = Toast.makeText(context,
                 "positive button clicked", Toast.LENGTH_LONG);
         toast.show();
-        adapter.clear(); //here you can do stuff with the bag and
+        firebase.removeValue(); //here you can do stuff with the bag and
         //adapter etc.
     }
 
@@ -117,7 +124,20 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                 android.R.layout.simple_list_item_checked, bag);
 
         //setting the adapter on the listview
-        listView.setAdapter(adapter);
+        //listView.setAdapter(adapter);
+
+
+        firebase = FirebaseDatabase.getInstance().getReference().child("items");
+
+        mAdapter = new FirebaseListAdapter<Product>(this, Product.class, android.R.layout.simple_list_item_checked, firebase) {
+            @Override
+            protected void populateView(View view, Product product, int i) {
+                TextView textView = (TextView) view.findViewById(android.R.id.text1); //standard android id.
+                textView.setText(product.toString());
+            }
+        };
+        listView.setAdapter(mAdapter);
+
         //here we set the choice mode - meaning in this case we can
         //only select one item at a time.
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -129,7 +149,8 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
             public void onClick(View v) {
                 //læs fra edittext felterne
                 Product p = new Product(getProductQuantityInt(), getProductName());
-                adapter.add(p);
+                //adapter.add(p);
+                firebase.push().setValue(p);
                 //The next line is needed in order to say to the ListView
                 //that the data has changed - we have added stuff now!
                 getMyAdapter().notifyDataSetChanged();
@@ -142,7 +163,8 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
             @Override
             public void onClick(View v) {
 
-                bag.remove(listView.getCheckedItemPosition());
+                int index = listView.getCheckedItemPosition();
+                getMyAdapter().getRef(index).setValue(null);
                 //The next line is needed in order to say to the ListView
                 //that the data has changed - we have added stuff now!
                 getMyAdapter().notifyDataSetChanged();
@@ -161,6 +183,14 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                 getMyAdapter().notifyDataSetChanged();
             }
         })*/
+
+        getSupportActionBar().setHomeButtonEnabled(true);
+
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, getText(R.id.list));
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.send_to)));
 
     }
 
@@ -225,6 +255,18 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         if (id == R.id.action_settings) {
             return true;
         }
+
+        switch (item.getItemId()) {
+
+            case R.id.item_clear:
+                dialog = new MyDialog();
+                //Here we show the dialog
+                //The tag "MyFragement" is not important for us.
+                dialog.show(getFragmentManager(), "MyFragment");
+
+
+                return true;
+        };
 
         return super.onOptionsItemSelected(item);
     }
