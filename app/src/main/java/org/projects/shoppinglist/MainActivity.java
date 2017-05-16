@@ -30,7 +30,7 @@ import static org.projects.shoppinglist.ProductInfoAdapter.context;
 public class MainActivity extends AppCompatActivity implements MyDialogFragment.OnPositiveListener {
 
 
-    private String[] items = { "0", "1", "2", "3", "4",
+    private String[] items ={ "0", "1", "2", "3", "4",
             "5", "6", "7" };
 
     private static final String TAG = "com.example.StateChange";
@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
 
     static MyDialogFragment dialog;
     static Context context;
+    static TextView textView;
 
 
     ArrayAdapter<Product> adapter;
@@ -84,10 +85,10 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         //we use a predefined simple spinner drop down,
         //you could define your own layout, so that for instance
         //there was pictures in the drop down list.
-        adapter2 = new ArrayAdapter<>(this,
+        /*adapter2 = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item, items);
 
-        spinner.setAdapter(adapter2);
+        spinner.setAdapter(adapter2);*/
 
         spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 
@@ -132,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         mAdapter = new FirebaseListAdapter<Product>(this, Product.class, android.R.layout.simple_list_item_checked, firebase) {
             @Override
             protected void populateView(View view, Product product, int i) {
-                TextView textView = (TextView) view.findViewById(android.R.id.text1); //standard android id.
+                textView = (TextView) view.findViewById(android.R.id.text1); //standard android id.
                 textView.setText(product.toString());
             }
         };
@@ -186,13 +187,31 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
 
         getSupportActionBar().setHomeButtonEnabled(true);
 
+
+        Button btnShare = (Button)findViewById(R.id.item_share);
+        //btnShare.setOnClickListener(new View.OnClickListener() {
+
+
+        bag.add(0, new Product(3, "banan"));
+        bag.add(1, new Product(4, "banan2"));
+        bag.add(2, new Product(5, "banan3"));
+            //@Override
+           // public void onClick(View v) {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, getText(R.id.list));
+
+        String listString = "";
+
+        for (Product p : bag){
+            listString += p.toString();
+        }
+        sendIntent.putExtra(Intent.EXTRA_TEXT, firebase.child("items").toString());
         sendIntent.setType("text/plain");
         startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.send_to)));
 
     }
+        //});
+    //};
 
         //add some stuff to the list so we have something
         // to show on app startup
