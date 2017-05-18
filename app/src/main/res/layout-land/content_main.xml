@@ -19,8 +19,18 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:textStyle="bold"
         android:layout_gravity="center"
-        android:text="Welcome to my shopping list" />
+        android:text="Welcome to your shopping list " />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:id="@+id/myName"
+        android:text="" />
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -79,12 +89,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Delete" />
-        <Button
-            android:id="@+id/clearButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="showDialog"
-            android:text="Clear" />
 
     </LinearLayout>
 

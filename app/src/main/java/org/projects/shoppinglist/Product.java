@@ -11,6 +11,15 @@ public class Product implements Parcelable {
 
     String name;
     int quantity;
+    String unit;
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
 
     public Product() {} //Empty constructor we will need later!
 
@@ -50,6 +59,7 @@ public class Product implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(name);
         parcel.writeInt(quantity);
+        parcel.writeString(unit);
     }
 
     public static final Parcelable.Creator CREATOR
@@ -67,6 +77,7 @@ public class Product implements Parcelable {
     public Product(Parcel in) {
         name = in.readString();
         quantity = in.readInt();
+        unit = in.readString();
     }
 }
 
