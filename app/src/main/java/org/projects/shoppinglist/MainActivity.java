@@ -85,10 +85,10 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         //we use a predefined simple spinner drop down,
         //you could define your own layout, so that for instance
         //there was pictures in the drop down list.
-        /*adapter2 = new ArrayAdapter<>(this,
+        adapter2 = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item, items);
 
-        spinner.setAdapter(adapter2);*/
+        spinner.setAdapter(adapter2);
 
         spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 
@@ -173,59 +173,16 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
             }
         });
 
-        /*Button clearButton = (Button) findViewById(R.id.clearButton);
-
-        clearButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                bag.clear();
-                //The next line is needed in order to say to the ListView
-                //that the data has changed - we have added stuff now!
-                getMyAdapter().notifyDataSetChanged();
-            }
-        })*/
-
         getSupportActionBar().setHomeButtonEnabled(true);
-
-
-        Button btnShare = (Button)findViewById(R.id.item_share);
-        //btnShare.setOnClickListener(new View.OnClickListener() {
-
-
-        bag.add(0, new Product(3, "banan"));
-        bag.add(1, new Product(4, "banan2"));
-        bag.add(2, new Product(5, "banan3"));
-            //@Override
-           // public void onClick(View v) {
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-
-        String listString = "";
-
-        for (Product p : bag){
-            listString += p.toString();
-        }
-        sendIntent.putExtra(Intent.EXTRA_TEXT, firebase.child("items").toString());
-        sendIntent.setType("text/plain");
-        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.send_to)));
-
     }
-        //});
-    //};
+
+
 
         //add some stuff to the list so we have something
         // to show on app startup
         //bag.add("Bananas");
         //bag.add("Apples");
 
-        public void showDialog(View v) {
-            //showing our dialog.
-
-            dialog = new MyDialog();
-            //Here we show the dialog
-            //The tag "MyFragement" is not important for us.
-            dialog.show(getFragmentManager(), "MyFragment");
-        }
 
     public static class MyDialog extends MyDialogFragment {
 
@@ -275,6 +232,21 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
             return true;
         }
 
+        if(id == R.id.item_share) {
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            int nr = mAdapter.getCount();
+            String result = "";
+            for (int i = 0; i<nr; i++) {
+                Product p = mAdapter.getItem(i);
+                result = result + p.toString() + "\n";
+            }
+            sendIntent.putExtra(Intent.EXTRA_TEXT, result);
+            sendIntent.setType("text/plain");
+            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.send_to)));
+        }
+
+
         switch (item.getItemId()) {
 
             case R.id.item_clear:
@@ -282,7 +254,6 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                 //Here we show the dialog
                 //The tag "MyFragement" is not important for us.
                 dialog.show(getFragmentManager(), "MyFragment");
-
 
                 return true;
         };
