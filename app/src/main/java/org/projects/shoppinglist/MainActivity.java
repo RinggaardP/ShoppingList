@@ -30,17 +30,14 @@ import static org.projects.shoppinglist.ProductInfoAdapter.context;
 public class MainActivity extends AppCompatActivity implements MyDialogFragment.OnPositiveListener {
 
 
-    private String[] items ={ "0", "1", "2", "3", "4",
-            "5", "6", "7" };
+    private String[] items ={ "1", "2", "3", "4",
+            "5", "6", "7", "8", "9" };
 
     private static final String TAG = "com.example.StateChange";
     private String name = "";
-
     static MyDialogFragment dialog;
     static Context context;
     static TextView textView;
-
-
     ArrayAdapter<Product> adapter;
     ArrayAdapter<String> adapter2;
     ListView listView;
@@ -177,14 +174,6 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         getSupportActionBar().setHomeButtonEnabled(true);
     }
 
-
-
-        //add some stuff to the list so we have something
-        // to show on app startup
-        //bag.add("Bananas");
-        //bag.add("Apples");
-
-
     public static class MyDialog extends MyDialogFragment {
 
 
@@ -257,16 +246,12 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
             //onActivityResult
 
         }
-        switch (item.getItemId()) {
-
-            case R.id.item_clear:
+            if(item.getItemId()==R.id.item_clear) {
                 dialog = new MyDialog();
                 //Here we show the dialog
                 //The tag "MyFragement" is not important for us.
                 dialog.show(getFragmentManager(), "MyFragment");
-
-                return true;
-        };
+            }
 
         return super.onOptionsItemSelected(item);
     }
