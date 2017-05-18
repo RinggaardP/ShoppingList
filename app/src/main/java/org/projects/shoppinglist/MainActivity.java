@@ -53,8 +53,6 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         return mAdapter;
     }
 
-    Product lastDeletedProduct;
-    int lastDeletedPosition;
 
     public void onPositiveClicked() {
         //Do your update stuff here to the listview
@@ -79,6 +77,9 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
             if (savedInstanceState.containsKey("bag"))
                 bag = savedInstanceState.getParcelableArrayList("bag");
         }
+
+        String name = MyPreferenceFragment.getName(this);
+        updateUI(name);
 
         Spinner spinner = (Spinner) findViewById(R.id.addTextQ);
 
@@ -227,10 +228,9 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+
 
         if(id == R.id.item_share) {
             Intent sendIntent = new Intent();
@@ -246,7 +246,17 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
             startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.send_to)));
         }
 
+        if (item.getItemId()==R.id.action_settings)
+        {
+            //Start our settingsactivity and listen to result - i.e.
+            //when it is finished.
+            Intent intent = new Intent(this,SettingsActivity.class);
+            startActivityForResult(intent,1);
+            Log.d("shopping","settingsstarted");
+            //notice the 1 here - this is the code we then listen for in the
+            //onActivityResult
 
+        }
         switch (item.getItemId()) {
 
             case R.id.item_clear:
@@ -273,15 +283,27 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         outState.putParcelableArrayList("bag", bag);
 
     }
-    //this is called when our activity is recreated, but
-    //AFTER our onCreate method has been called
-    //EXTREMELY IMPORTANT DETAIL
 
-    public void saveCopy()
+    //This method updates our text views.
+    public void updateUI(String name)
     {
-        lastDeletedPosition = listView.getCheckedItemPosition();
-        lastDeletedProduct = bag.get(lastDeletedPosition);
+        TextView myName = (TextView) findViewById(R.id.myName);
+        myName.setText(name);
     }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode==1) //the code means we came back from settings
+        {
+            //I can can these methods like this, because they are static
+            String name = MyPreferenceFragment.getName(this);
+            String message = "Welcome, "+name;
+            Toast toast = Toast.makeText(this,message,Toast.LENGTH_LONG);
+            toast.show();
+            updateUI(name);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
 
 
 
