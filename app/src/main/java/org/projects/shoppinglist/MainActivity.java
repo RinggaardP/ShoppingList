@@ -85,6 +85,12 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         numberPicker.setMinValue(0);
         numberPicker.setMaxValue(items.length-1);
         numberPicker.setDisplayedValues(items);
+        numberPicker.setFormatter(new NumberPicker.Formatter(){
+            @Override
+            public String format (int val){
+                return items[val];
+            }
+        });
 
         //getting our listiew - you can check the ID in the xml to see that it
         //is indeed specified as "list"
@@ -96,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
             @Override
             protected void populateView(View view, Product product, int i) {
                 textView = (TextView) view.findViewById(android.R.id.text1); //standard android id.
-                textView.setText(product.toString());
+                textView.setText(product.getName() +" - "+ product.getQuantity()+" "+format(Integer.parseInt(product.getUnit())));////
             }
         };
 
@@ -114,9 +120,8 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
             public void onClick(View v) {
                 //læs fra edittext felterne
                 Product p = new Product(getProductQuantityInt(), getProductName());
-                if (!(getProductUnit()==null)){
-                    p.setUnit(getProductUnit());
-                }
+                p.setUnit(getProductUnit());
+
 
 
                 //adapter.add(p);
@@ -183,13 +188,12 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         return addText.getText().toString();
     }
 
-
     public int getProductQuantityInt() {
         EditText input = (EditText) findViewById(R.id.addTextQ);
         String inputValue = input.getText().toString();
         return Integer.parseInt(inputValue);
-
     }
+
     public String getProductUnit(){
          String unit = numberPicker.getValue() + "";
          return unit;
@@ -264,7 +268,9 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
-
+    public   String format (int val){
+    return items[val];
+}
     //This method updates our text views.
     //UPDATES NAME USING INPUT FROM SETTINGS
     public void updateUI(String name) {
