@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
     NumberPicker numberPicker;
 
     //ArrayAdapter<Product> adapter;
-    ArrayAdapter<String> adapter2;
+    //ArrayAdapter<String> adapter2;
 
     ListView listView;
     Toolbar toolbar;
@@ -85,12 +85,6 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         numberPicker.setMinValue(0);
         numberPicker.setMaxValue(items.length-1);
         numberPicker.setDisplayedValues(items);
-        numberPicker.setFormatter(new NumberPicker.Formatter(){
-            @Override
-            public String format (int val){
-                return items[val];
-            }
-        });
 
         //getting our listiew - you can check the ID in the xml to see that it
         //is indeed specified as "list"
@@ -120,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
             public void onClick(View v) {
                 //læs fra edittext felterne
                 Product p = new Product(getProductQuantityInt(), getProductName());
-                p.setUnit(getProductUnit());
+                p.setUnit(getProductUnit() + "");
 
 
 
@@ -194,12 +188,12 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         return Integer.parseInt(inputValue);
     }
 
-    public String getProductUnit(){
-         String unit = numberPicker.getValue() + "";
+    public int getProductUnit(){
+         int unit = numberPicker.getValue();
          return unit;
     }
 
-    /*----ACTIONAR/MENU----*/
+    /*----ACTIONBAR/MENU----*/
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -227,10 +221,8 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
             //when it is finished.
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivityForResult(intent, 1);
-            Log.d("shopping", "settingsstarted");
             //notice the 1 here - this is the code we then listen for in the
             //onActivityResult
-
         }
         /*CLEAR*/
         if (item.getItemId() == R.id.item_clear) {
@@ -268,13 +260,14 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
-    public   String format (int val){
-    return items[val];
-}
     //This method updates our text views.
     //UPDATES NAME USING INPUT FROM SETTINGS
     public void updateUI(String name) {
         TextView myName = (TextView) findViewById(R.id.myName);
         myName.setText(name);
+    }
+
+    public   String format (int val){
+        return items[val];
     }
 }
